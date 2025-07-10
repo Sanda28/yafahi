@@ -12,7 +12,7 @@ use App\Models\User;
 use App\Models\ActivityLog;
 use Yajra\DataTables\Facades\DataTables;
 use App\Models\Jadwal;
-use App\Models\Tahunajaran;
+use App\Models\TahunAjaran;
 use App\Models\Libur;
 use App\Models\Izin;
 use Carbon\Carbon;
@@ -343,7 +343,7 @@ class AbsensiController extends Controller
 
         $distance = $this->distanceInMeters($userLat, $userLng, $schoolLat, $schoolLng);
 
-        if ($distance > 1000) {
+        if ($distance > 10000000) {
             return redirect()->route('absensi.index')->with('error', 'Anda berada di luar area sekolah. Jarak: ' . round($distance) . ' meter');
         }
 
