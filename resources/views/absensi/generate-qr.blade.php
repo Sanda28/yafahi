@@ -5,6 +5,7 @@
 @section('content')
 <div class="container mt-5">
     <div class="row justify-content-center">
+
         <!-- QR CODE -->
         <div class="col-lg-6 text-center mb-4">
             <h3>Scan QR Code untuk Absen</h3>
@@ -31,7 +32,7 @@
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $absen->user->name ?? '-' }}</td>
-                            <td>{{ $absen->waktu_absen->format('H:i:s') }}</td>
+                            <td>{{ $absen->waktu_absen ? \Carbon\Carbon::parse($absen->waktu_absen)->format('H:i:s') : '-' }}</td>
                         </tr>
                     @empty
                         <tr>
@@ -41,6 +42,7 @@
                 </tbody>
             </table>
         </div>
+
     </div>
 </div>
 
@@ -52,7 +54,10 @@
 
     function refreshQrAndAbsensi() {
         fetch("{{ route('absensi.qr.refresh') }}")
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw new Error("Gagal fetch");
+                return res.json();
+            })
             .then(data => {
                 qrContainer.innerHTML = data.qr;
                 absensiTbody.innerHTML = data.absensi;
@@ -61,6 +66,9 @@
             })
             .catch(error => {
                 console.error("Gagal fetch QR:", error);
+                qrContainer.innerHTML = '<div class="text-danger">Gagal memuat QR</div>';
+                qrContainer.style.opacity = '1';
+                refreshIcon.style.transform = 'rotate(0deg)';
             });
     }
 

@@ -27,9 +27,21 @@ class AbsensiController extends Controller
 
         // Admin / Superadmin: tampilkan semua absensi
         if (in_array($user->role, ['admin', 'superadmin'])) {
-            $absensis = Absensi::with('user')->orderByDesc('tanggal')->get();
-            return view('absensi.index', compact('absensis'));
-        }
+        $namaFilter = $request->input('nama');
+
+        $absensis = Absensi::with('user')
+            ->when($namaFilter, function ($query, $namaFilter) {
+                $query->whereHas('user', function ($q) use ($namaFilter) {
+                    $q->where('name', $namaFilter);
+                });
+            })
+            ->orderByDesc('tanggal')
+            ->simplePaginate(10);
+
+        $daftarNama = User::pluck('name')->sort(); // semua nama user
+
+        return view('absensi.index', compact('absensis', 'daftarNama', 'namaFilter'));
+    }
 
         // ==== UNTUK USER ====
         $bulan = $request->input('bulan') ?? now()->format('Y-m');
@@ -388,13 +400,15 @@ class AbsensiController extends Controller
     {
         $today = now()->toDateString();
 
+        // Ambil token aktif jika ada
         $qrToken = QrToken::where('tanggal', $today)
             ->where('expired_at', '>', now())
             ->orderByDesc('expired_at')
             ->first();
 
+        // Jika tidak ada, buat baru
         if (!$qrToken) {
-            QrToken::where('tanggal', $today)->delete();
+            QrToken::where('tanggal', $today)->delete(); // bersihkan token lama
 
             $qrToken = QrToken::create([
                 'hash' => Str::random(20),
@@ -404,7 +418,7 @@ class AbsensiController extends Controller
         }
 
         $qr = QrCode::size(200)->generate(route('absensi.scan', ['hash' => $qrToken->hash]));
-        $absensiToday = Absensi::whereDate('tanggal', $today)->get();
+        $absensiToday = Absensi::whereDate('tanggal', $today)->with('user')->get();
 
         return view('absensi.generate-qr', compact('qr', 'absensiToday'));
     }
@@ -413,14 +427,15 @@ class AbsensiController extends Controller
     {
         $today = now()->toDateString();
 
+        // Bersihkan token lama
+        QrToken::where('expired_at', '<=', now())->delete();
+
         $qrToken = QrToken::where('tanggal', $today)
             ->where('expired_at', '>', now())
             ->orderByDesc('expired_at')
             ->first();
 
         if (!$qrToken) {
-            QrToken::where('tanggal', $today)->delete();
-
             $qrToken = QrToken::create([
                 'hash' => Str::random(20),
                 'tanggal' => $today,
@@ -430,7 +445,7 @@ class AbsensiController extends Controller
 
         $qr = QrCode::size(200)->generate(route('absensi.scan', ['hash' => $qrToken->hash]));
 
-        $absensiToday = Absensi::whereDate('tanggal', $today)->get();
+        $absensiToday = Absensi::whereDate('tanggal', $today)->with('user')->get();
         $absensiHtml = '';
 
         if ($absensiToday->isEmpty()) {
@@ -440,13 +455,13 @@ class AbsensiController extends Controller
                 $absensiHtml .= '<tr>';
                 $absensiHtml .= '<td>' . ($index + 1) . '</td>';
                 $absensiHtml .= '<td>' . ($absen->user->name ?? '-') . '</td>';
-                $absensiHtml .= '<td>' . $absen->waktu_absen->format('H:i:s') . '</td>';
+                $absensiHtml .= '<td>' . ($absen->waktu_absen ? date('H:i:s', strtotime($absen->waktu_absen)) : '-') . '</td>';
                 $absensiHtml .= '</tr>';
             }
         }
 
         return response()->json([
-            'qr' => (string) $qr, // ← solusi penting
+            'qr' => (string) $qr,
             'absensi' => $absensiHtml,
         ]);
     }
