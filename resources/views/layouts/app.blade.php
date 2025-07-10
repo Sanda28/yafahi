@@ -11,7 +11,7 @@
     <link href="https://cdn.jsdelivr.net/npm/startbootstrap-sb-admin-2@4.1.4/css/sb-admin-2.min.css" rel="stylesheet">
 
     <!-- DataTables CSS -->
-    <link rel="stylesheet" href="{{ asset('datatables/css/dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="https://yafahi-production.up.railway.app/datatables/css/dataTables.bootstrap5.min.css">
 
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
 

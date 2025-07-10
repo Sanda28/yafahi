@@ -53,7 +53,7 @@
     const absensiTbody = document.querySelector('#absensi-tbody');
 
     function refreshQrAndAbsensi() {
-        fetch("{{ route('absensi.qr.refresh') }}")
+        fetch("{{ secure_url(route('absensi.qr.refresh', [], false)) }}")
             .then(res => {
                 if (!res.ok) throw new Error("Gagal fetch");
                 return res.json();
