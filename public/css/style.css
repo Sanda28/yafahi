@@ -1,0 +1,141 @@
+/* Font dan Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+    scroll-behavior: smooth;
+  }
+  html, body {
+    height: 100%;
+    background-color: #f7f7f7;
+  }
+
+  /* Container */
+  .container {
+    width: 85%;
+    margin: 0 auto;
+  }
+  @media (max-width: 992px) {
+    .container {
+      width: 90%;
+    }
+  }
+
+  /* Navbar */
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px 0;
+    transition: 0.3s ease-in-out;
+    z-index: 1000;
+    background-color: transparent;
+  }
+  .navbar.scrolled {
+    background-color: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  .navbar-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .navbar-box .logo h1 {
+    color: #000;
+    font-weight: bold;
+  }
+  .navbar-box .menu {
+    display: flex;
+    gap: 30px;
+    list-style: none;
+  }
+  .navbar-box .menu li a {
+    color: black;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s;
+  }
+  .navbar-box .menu li a:hover {
+    color: #4b0082;
+  }
+  @media (max-width: 768px) {
+    .navbar-box {
+      flex-direction: column;
+    }
+    .navbar-box .menu {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+  body {
+    padding-top: 100px;
+  }
+
+  /* Hero Section */
+  .hero.fullscreen {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .hero-box {
+    background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/assets/images/hero.webp');
+    background-size: cover;
+    background-position: center;
+    padding: 120px 30px;
+    border-radius: 25px;
+    color: white;
+    text-align: center;
+  }
+  .hero-box h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+  }
+  .hero-box p {
+    font-size: 1.2rem;
+    max-width: 600px;
+    margin: 0 auto 30px auto;
+    opacity: 0.9;
+  }
+  .hero-box a {
+    background-color: indigo;
+    color: #fff;
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.3s;
+  }
+  .hero-box a:hover {
+    background-color: #4b0082;
+  }
+
+  /* Scroll Up */
+  .scroll-up {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: indigo;
+    color: white;
+    padding: 10px 12px;
+    border-radius: 50%;
+    text-decoration: none;
+    font-size: 18px;
+    display: none;
+    z-index: 1000;
+  }
+  .scroll-up.show {
+    display: block;
+  }
+
+  /* Responsive spacing if needed */
+  @media (max-width: 768px) {
+    .hero-box h1 {
+      font-size: 2rem;
+    }
+    .hero-box p {
+      font-size: 1rem;
+    }
+  }
