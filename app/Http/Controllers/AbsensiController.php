@@ -29,19 +29,24 @@ class AbsensiController extends Controller
         if (in_array($user->role, ['admin', 'superadmin'])) {
         $namaFilter = $request->input('nama');
 
-        $absensis = Absensi::with('user')
-            ->when($namaFilter, function ($query, $namaFilter) {
-                $query->whereHas('user', function ($q) use ($namaFilter) {
-                    $q->where('name', $namaFilter);
-                });
-            })
-            ->orderByDesc('tanggal')
-            ->simplePaginate(10);
+        $absensis = Absensi::with(['user' => function ($query) {
+                    $query->where('role', 'user'); // ← hanya role user
+                }])
+                ->whereHas('user', function ($q) {
+                    $q->where('role', 'user'); // ← penting untuk filter juga di Absensi
+                })
+                ->when($namaFilter, function ($query, $namaFilter) {
+                    $query->whereHas('user', function ($q) use ($namaFilter) {
+                        $q->where('name', $namaFilter);
+                    });
+                })
+                ->orderByDesc('tanggal')
+                ->simplePaginate(10);
 
-        $daftarNama = User::pluck('name')->sort(); // semua nama user
+            $daftarNama = User::where('role', 'user')->orderBy('name')->pluck('name'); // ← hanya user
 
-        return view('absensi.index', compact('absensis', 'daftarNama', 'namaFilter'));
-    }
+            return view('absensi.index', compact('absensis', 'daftarNama', 'namaFilter'));
+        }
 
         // ==== UNTUK USER ====
         $bulan = $request->input('bulan') ?? now()->format('Y-m');

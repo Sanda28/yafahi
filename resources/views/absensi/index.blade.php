@@ -1,4 +1,5 @@
 @extends('layouts.app')
+
 @section('title', 'Data Absensi')
 
 @section('content')
@@ -8,14 +9,8 @@
             <h6 class="m-0 font-weight-bold text-primary">Data Absensi</h6>
         </div>
         <div class="card-body">
-            {{-- Tombol Tambah --}}
-            @if(in_array(Auth::user()->role, ['admin', 'superadmin']))
-                <a href="{{ route('absensi.create') }}" class="btn btn-primary mb-3">
-                    <i class="bi bi-plus-circle me-1"></i> Tambah Data Absen
-                </a>
-            @endif
 
-            {{-- Filter Nama --}}
+            {{-- Form Filter --}}
             <form method="GET" class="mb-3 row g-2 align-items-center">
                 <div class="col-auto">
                     <label for="nama" class="form-label mb-0">Filter Nama</label>
@@ -24,7 +19,9 @@
                     <select name="nama" id="nama" class="form-select">
                         <option value="">-- Semua --</option>
                         @foreach ($daftarNama as $nama)
-                            <option value="{{ $nama }}" {{ request('nama') == $nama ? 'selected' : '' }}>{{ $nama }}</option>
+                            <option value="{{ $nama }}" {{ request('nama') == $nama ? 'selected' : '' }}>
+                                {{ $nama }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
@@ -38,7 +35,7 @@
                 </div>
             </form>
 
-            {{-- Tabel --}}
+            {{-- Tabel Absensi --}}
             @if($absensis->count() > 0)
                 <div class="table-responsive">
                     <table class="table table-bordered">

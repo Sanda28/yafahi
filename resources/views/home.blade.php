@@ -66,7 +66,7 @@
     }
 
     .hero-box {
-      background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/assets/images/Background1.jpg');
+      background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/assets/images/background1.jpg');
       background-size: cover; background-position: center;
       padding: 120px 30px; border-radius: 25px;
       color: rgb(255, 217, 0); text-align: center;
