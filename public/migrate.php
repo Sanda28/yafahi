@@ -1,9 +1,21 @@
 <?php
-require __DIR__.'/../vendor/autoload.php';
-$app = require_once __DIR__.'/../bootstrap/app.php';
+
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+$app = require_once __DIR__ . '/../bootstrap/app.php';
+
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
-$kernel->handle(
-    Symfony\Component\Console\Input\StringInput::fromString('migrate --seed --force'),
-    new Symfony\Component\Console\Output\ConsoleOutput
-);
-echo "Migration and seeding done.";
+
+// Jalankan migrate --seed --force
+$input = new ArrayInput([
+    'command' => 'migrate',
+    '--seed' => true,
+    '--force' => true,
+]);
+
+$status = $kernel->handle($input, new ConsoleOutput());
+
+echo "Migration and seeding finished with status code: " . $status;
