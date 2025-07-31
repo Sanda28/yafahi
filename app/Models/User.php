@@ -17,21 +17,12 @@ class User extends Authenticatable
     use HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'nik',
-        'jadwal',
-        'jabatan',
-        'jenis_kelamin',
-        'tempat_lahir',
-        'tanggal_lahir',
-        'role',
+        'name', 'email', 'password', 'nik', 'jadwal', 'jabatan',
+        'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'role',
     ];
 
     protected $hidden = [
-        'password',
-        'remember_token',
+        'password', 'remember_token',
     ];
 
     protected $casts = [
@@ -39,18 +30,7 @@ class User extends Authenticatable
         'jadwal' => 'array',
     ];
 
-    public function absensis()
-    {
-        return $this->hasMany(Absensi::class);
-    }
-
-    public function izins()
-    {
-        return $this->hasMany(Izin::class);
-    }
-
-    public function jadwals()
-    {
-        return $this->hasMany(Jadwal::class);
-    }
+    public function absensis() { return $this->hasMany(Absensi::class); }
+    public function izins() { return $this->hasMany(Izin::class); }
+    public function jadwals() { return $this->hasMany(Jadwal::class); }
 }

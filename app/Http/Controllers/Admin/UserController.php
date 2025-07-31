@@ -10,15 +10,14 @@ use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
-use Illuminate\Support\Facades\Redirect;
 
 class UserController extends Controller
 {
     public function index()
     {
         $users = auth()->user()->role === 'admin'
-            ? User::where('role', 'user')->simplePaginate(30)
-            : User::simplePaginate(30);
+            ? User::withTrashed()->where('role', 'user')->simplePaginate(30)
+            : User::withTrashed()->simplePaginate(30);
 
         return view('admin.users.index', compact('users'));
     }
@@ -60,9 +59,7 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        if (auth()->user()->role === 'admin' && $user->role !== 'user') {
-            abort(403, 'Akses ditolak.');
-        }
+        if (auth()->user()->role === 'admin' && $user->role !== 'user') abort(403);
 
         $roles = auth()->user()->role === 'superadmin' ? ['admin', 'user'] : ['user'];
         return view('admin.users.edit', compact('user', 'roles'));
@@ -70,9 +67,7 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        if (auth()->user()->role === 'admin' && $user->role !== 'user') {
-            abort(403, 'Akses ditolak.');
-        }
+        if (auth()->user()->role === 'admin' && $user->role !== 'user') abort(403);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -85,16 +80,12 @@ class UserController extends Controller
             'nik' => 'nullable|string|max:50',
         ]);
 
-        $user->update([
-            'name' => $validated['name'],
-            'role' => $validated['role'],
-            'jabatan' => $validated['jabatan'] ?? null,
-            'jenis_kelamin' => $validated['jenis_kelamin'] ?? null,
-            'tanggal_lahir' => $validated['tanggal_lahir'] ?? null,
-            'tempat_lahir' => $validated['tempat_lahir'] ?? null,
-            'nik' => $validated['nik'] ?? null,
-            'password' => !empty($validated['password']) ? Hash::make($validated['password']) : $user->password,
-        ]);
+        $user->update(array_merge(
+            $validated,
+            [
+                'password' => !empty($validated['password']) ? Hash::make($validated['password']) : $user->password,
+            ]
+        ));
 
         ActivityLog::create([
             'user_id' => auth()->id(),
@@ -110,22 +101,24 @@ class UserController extends Controller
     public function destroy($id)
     {
         $user = User::findOrFail($id);
-
-        // Cek apakah punya absensi atau jadwal tahun sebelumnya
-        $punyaJadwalLama = $user->jadwals()->where('tahun_ajaran_id', '!=', TahunAjaran::aktif()->id)->exists();
-        $punyaAbsensiLama = $user->absensis()->whereHas('tahunAjaran', function($q) {
-            $q->where('status', 'nonaktif');
-        })->exists();
-
-        if ($punyaJadwalLama || $punyaAbsensiLama) {
-            return redirect()->back()->with('error', 'User tidak bisa dihapus karena masih memiliki data pada tahun ajaran sebelumnya.');
-        }
-
-        // Jika tidak punya data lama, boleh dihapus
         $user->delete();
 
-        return redirect()->back()->with('success', 'User berhasil dihapus.');
+        return redirect()->back()->with('success', 'User berhasil dinonaktifkan.');
     }
 
+    public function restore($id)
+    {
+        $user = User::onlyTrashed()->findOrFail($id);
+        $user->restore();
 
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action_type' => 'restore',
+            'model' => 'user',
+            'model_id' => $user->id,
+            'description' => 'Mengaktifkan kembali user: ' . $user->name,
+        ]);
+
+        return redirect()->back()->with('success', 'User berhasil diaktifkan kembali.');
+    }
 }

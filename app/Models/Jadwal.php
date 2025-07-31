@@ -23,9 +23,10 @@ class Jadwal extends Model
 
     // Relasi ke user
     public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
+{
+    return $this->belongsTo(User::class)->withTrashed();
+}
+
 
     // Relasi ke tahun ajaran
     public function tahunAjaran()

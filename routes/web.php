@@ -68,6 +68,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/admin/users/{user}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
         Route::put('/admin/users/{user}', [UserController::class, 'update'])->name('admin.users.update');
         Route::delete('/admin/users/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
+        Route::post('/admin/users/{id}/restore', [UserController::class, 'restore'])->name('admin.users.restore');
 
         // Generate QR code
         Route::get('/absensi/generate-qr', [AbsensiController::class, 'generateQr'])->name('absensi.generate.qr');
@@ -94,6 +95,7 @@ Route::middleware(['auth'])->group(function () {
         // Route untuk mendapatkan guru yang tersedia pada tahun ajaran tertentu
         Route::get('/admin/jadwal/guru-available', [JadwalController::class, 'getAvailableGuru']);
         Route::post('/admin/tahunajaran/{id}/aktifkan', [JadwalController::class, 'aktifkan'])->name('admin.tahunajaran.aktifkan');
+        Route::delete('/admin/jadwal/{id}', [JadwalController::class, 'destroyJadwal'])->name('admin.jadwal.destroy');
 
         // CRUD Tahun Ajaran
         Route::post('admin/tahunajaran', [JadwalController::class, 'storeTahunAjaran'])->name('admin.tahunajaran.store'); // Menyimpan tahun ajaran baru
