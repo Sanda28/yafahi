@@ -57,24 +57,26 @@
 @push('scripts')
 <script>
     $(document).ready(function () {
-        let table = $('#userTable').DataTable({
-            paging: true,
-            searching: true,
-            ordering: false,
-            columnDefs: [{
-                targets: 0,
-                searchable: false,
-                orderable: false,
-            }]
-        });
-
-        table.on('order.dt search.dt draw.dt', function () {
-            table.column(0, { search: 'applied', order: 'applied', page: 'current' })
-                .nodes()
-                .each(function (cell, i) {
-                    cell.innerHTML = i + 1;
-                });
-        }).draw();
+    let table = $('#userTable').DataTable({
+        paging: true,
+        searching: true,
+        ordering: false,
+        info: true,
+        columnDefs: [{
+            targets: 0,
+            searchable: false,
+            orderable: false,
+        }],
+        drawCallback: function (settings) {
+            let api = this.api();
+            api.column(0, { search: 'applied', order: 'applied', page: 'current' })
+               .nodes()
+               .each(function (cell, i) {
+                   cell.innerHTML = i + 1 + settings._iDisplayStart;
+               });
+        }
     });
+});
+
 </script>
 @endpush

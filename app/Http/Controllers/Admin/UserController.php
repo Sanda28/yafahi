@@ -21,6 +21,12 @@ class UserController extends Controller
 
         return view('admin.users.index', compact('users'));
     }
+    public function show(User $user)
+    {
+        if (auth()->user()->role === 'admin' && $user->role !== 'user') abort(403);
+        return view('admin.users.show', compact('user'));
+    }
+
 
     public function create()
     {
