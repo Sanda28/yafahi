@@ -28,6 +28,7 @@
                     <td>{{ ucfirst($user->role) }}</td>
                     <td>{{ $user->deleted_at ? 'Nonaktif' : 'Aktif' }}</td>
                     <td>
+                        <a href="{{ route('admin.users.show', $user) }}" class="btn btn-sm btn-info">Detail</a>
                         <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-warning">Edit</a>
 
                         @if ($user->deleted_at)
